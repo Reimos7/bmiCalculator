@@ -15,6 +15,8 @@ class bmiCalculatorViewController: UIViewController {
     
     @IBOutlet var mainImage: UIImageView!
     
+    @IBOutlet var nickNameTextField: UITextField!
+    
     @IBOutlet var bodyHeightLabel: UILabel!
     @IBOutlet var bodyHeightTextField: UITextField!
     
@@ -25,8 +27,20 @@ class bmiCalculatorViewController: UIViewController {
     
     @IBOutlet var bodyResultButton: UIButton!
   
+    @IBOutlet var resetButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // userDefaults로 저장한 내용 가져오기
+        let nickName = UserDefaults.standard.string(forKey: "nickName")
+        nickNameTextField.text = nickName
+        
+        let bodyHeight = UserDefaults.standard.string(forKey: "bodyHeight")
+        bodyHeightTextField.text = bodyHeight
+        
+        let bodyWeight = UserDefaults.standard.string(forKey: "bodyWeight")
+        bodyWeightTextField.text = bodyWeight
         
         titleLabel.text = "BMI Calculator"
         titleLabel.font = .boldSystemFont(ofSize: 24)
@@ -35,6 +49,9 @@ class bmiCalculatorViewController: UIViewController {
         subtitleLabel.text = "당신의 BMI 지수를 \n알려드릴게요"
         
         mainImage.image = UIImage(named: "image")
+        
+        nickNameTextField.placeholder = "닉네임을 입력해주세요"
+        nickNameTextField.font = .systemFont(ofSize: 24)
         
         bodyHeightLabel.text = "키가 어떻게 되시나요?"
         bodyWeightLabel.text = "몸무게는 어떻게 되시나요?"
@@ -45,12 +62,21 @@ class bmiCalculatorViewController: UIViewController {
         randomBmiButton.setTitle("랜덤으로 BMI 계산하기", for: .normal)
         randomBmiButton.setTitleColor(.red, for: .normal)
         
-        bodyResultButton.setTitle("결과 확인", for: .normal)
-        bodyResultButton.setTitleColor(.white, for: .normal)
-        bodyResultButton.backgroundColor = .purple
-        bodyResultButton.layer.cornerRadius = 20
-        bodyResultButton.layer.borderWidth = 2
+        buttonSet(bodyResultButton, "결과 확인")
+        buttonSet(resetButton, "RESET")
+        
       
+    }
+    
+    // 버튼 세팅
+    func buttonSet(_ button: UIButton,_ buttonSetTitle: String){
+        
+        button.setTitle(buttonSetTitle, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .purple
+        button.layer.cornerRadius = 20
+        button.layer.borderWidth = 2
+        
     }
     
    
@@ -84,11 +110,34 @@ class bmiCalculatorViewController: UIViewController {
         bmiResult = String(round(bmi)) + bmiResult
         alertMessage("BMI결과",bmiResult)
         
+        
+        // 닉네임, 키, 몸무게 저장하기
+        UserDefaults.standard.set(nickNameTextField.text, forKey: "nickName")
+        UserDefaults.standard.set(bodyHeightTextField.text, forKey: "bodyHeight")
+        UserDefaults.standard.set(bodyWeightTextField.text, forKey: "bodyWeight")
+        
     }
     
     @IBAction func randomButtonClicked(_ sender: UIButton)  {
         alertMessage("랜덤 BMI",randomBmiCalculator())
        
+    }
+    @IBAction func resetButtonClicked(_ sender: UIButton) {
+        
+        UserDefaults.standard.removeObject(forKey: "nickName")
+        UserDefaults.standard.removeObject(forKey: "bodyHeight")
+        UserDefaults.standard.removeObject(forKey: "bodyWeight")
+        
+        let nickName = UserDefaults.standard.string(forKey: "nickName")
+        nickNameTextField.text = nickName
+        
+        let bodyHeight = UserDefaults.standard.string(forKey: "bodyHeight")
+        bodyHeightTextField.text = bodyHeight
+        
+        let bodyWeight = UserDefaults.standard.string(forKey: "bodyWeight")
+        bodyWeightTextField.text = bodyWeight
+        
+        
     }
     func randomBmiCalculator () -> String  {
         
@@ -119,8 +168,13 @@ class bmiCalculatorViewController: UIViewController {
         return randomBmiResult
         
     }
+    
+    
   
-    // alert 설정 메시지 
+   
+    
+    
+    // alert 설정 메시지
     func alertMessage(_ mainTitleMessage: String,_ subTitleMessage: String){
         
         // 1) alert창 제목, 메세지 설정
